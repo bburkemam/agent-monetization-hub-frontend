@@ -9,9 +9,10 @@ export const Navigation: React.FC = () => {
 
   const navLinks = [
     { label: 'Guides', href: '/guides' },
-    { label: 'Tools', href: '/tools' },
+    { label: 'Case Studies', href: '/case-studies' },
+    { label: 'Revenue Streams', href: '/revenue-streams' },
+    { label: 'Tools', href: '/marketplace' },
     { label: 'API', href: '/api' },
-    { label: 'Community', href: '/community' },
     { label: 'Pricing', href: '/pricing' },
   ];
 

@@ -13,10 +13,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'btn-primary',
-  secondary: 'btn-secondary',
-  accent: 'btn-accent',
-  ghost: 'btn-ghost',
+  primary: 'btn-primary focus:ring-2 focus:ring-offset-2 focus:ring-[#0F172E]',
+  secondary: 'btn-secondary focus:ring-2 focus:ring-offset-2 focus:ring-[#0F172E]',
+  accent: 'btn-accent focus:ring-2 focus:ring-offset-2 focus:ring-[#0F172E]',
+  ghost: 'btn-ghost focus:ring-2 focus:ring-offset-2 focus:ring-[#0F172E]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

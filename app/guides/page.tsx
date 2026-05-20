@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardBody, CardHeader, Badge, Button } from '@/components';
 
@@ -13,6 +13,7 @@ const frameworks = [
     revenue: 'medium',
     description: 'Pay-per-call billing model. Best for: API-first agents.',
     readTime: 8,
+    tags: ['api', 'saas', 'scaling'],
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ const frameworks = [
     revenue: 'medium',
     description: 'Monthly/annual recurring revenue. Best for: SaaS agents.',
     readTime: 7,
+    tags: ['saas', 'recurring', 'predictable'],
   },
   {
     id: 3,
@@ -31,6 +33,7 @@ const frameworks = [
     revenue: 'high',
     description: 'Commission on results. Best for: Lead gen & sales agents.',
     readTime: 10,
+    tags: ['performance', 'leads', 'sales'],
   },
   {
     id: 4,
@@ -40,6 +43,7 @@ const frameworks = [
     revenue: 'high',
     description: 'Combine multiple pricing strategies.',
     readTime: 9,
+    tags: ['advanced', 'flexible', 'optimization'],
   },
   {
     id: 5,
@@ -49,6 +53,7 @@ const frameworks = [
     revenue: 'low',
     description: 'Free tier + premium features. Best for: Scaling quickly.',
     readTime: 6,
+    tags: ['growth', 'conversion', 'viral'],
   },
   {
     id: 6,
@@ -58,6 +63,17 @@ const frameworks = [
     revenue: 'high',
     description: 'Sell as another company\'s product.',
     readTime: 8,
+    tags: ['b2b', 'partnerships', 'enterprise'],
+  },
+  {
+    id: 7,
+    title: 'Licensing & Partnerships',
+    slug: 'licensing-partnerships',
+    effort: 'hard',
+    revenue: 'high',
+    description: 'License your agent technology to other platforms.',
+    readTime: 9,
+    tags: ['b2b', 'licensing', 'enterprise'],
   },
 ];
 
@@ -67,27 +83,63 @@ type RevenueFilter = 'all' | 'low' | 'medium' | 'high';
 export default function GuidesPage() {
   const [effort, setEffort] = useState<EffortFilter>('all');
   const [revenue, setRevenue] = useState<RevenueFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredFrameworks = frameworks.filter((f) => {
-    const effortMatch = effort === 'all' || f.effort === effort;
-    const revenueMatch = revenue === 'all' || f.revenue === revenue;
-    return effortMatch && revenueMatch;
-  });
+  const filteredFrameworks = useMemo(() => {
+    return frameworks.filter((f) => {
+      const effortMatch = effort === 'all' || f.effort === effort;
+      const revenueMatch = revenue === 'all' || f.revenue === revenue;
+      const searchMatch = searchQuery === '' || 
+        f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.tags.some(tag => tag.includes(searchQuery.toLowerCase()));
+      return effortMatch && revenueMatch && searchMatch;
+    });
+  }, [effort, revenue, searchQuery]);
 
   return (
     <div className="flex flex-col gap-0">
+      {/* Skip to main content */}
+      <a href="#main-content" className="sr-only focus:not-sr-only absolute top-0 left-0 bg-agent-blue text-white px-4 py-2 z-50 focus:outline-none focus:ring-2 focus:ring-accent-cyan">
+        Skip to main content
+      </a>
+
       {/* Hero */}
-      <section className="gradient-hero text-white py-16 lg:py-20">
+      <section className="gradient-hero text-white py-16 lg:py-20" aria-labelledby="guides-heading">
         <div className="container-max">
-          <h1 className="text-white mb-4">Monetization Frameworks</h1>
-          <p className="text-xl text-gray-300">
-            7 proven models to turn your agent into revenue. Filter by effort & revenue potential.
+          <h1 className="text-white mb-4" id="guides-heading">Monetization Frameworks</h1>
+          <p className="text-xl text-gray-300 mb-8">
+            7 proven models to turn your agent into revenue. Find the right one for your use case.
           </p>
+          
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative">
+              <svg 
+                className="absolute left-3 top-3 w-5 h-5 text-gray-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search frameworks (e.g., 'API', 'SaaS', 'leads')..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search frameworks"
+                aria-describedby="search-hint"
+                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white bg-opacity-10 border border-gray-300 border-opacity-30 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+              />
+              <span id="search-hint" className="sr-only">Type to filter frameworks by title, description, or tags</span>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 lg:py-16">
+      <section className="py-12 lg:py-16" id="main-content">
         <div className="container-max">
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Sidebar Filters */}
@@ -153,58 +205,82 @@ export default function GuidesPage() {
 
             {/* Main Grid */}
             <div className="lg:col-span-3">
-              <div className="mb-6">
-                <p className="text-text-secondary">
-                  Showing {filteredFrameworks.length} of {frameworks.length} frameworks
-                </p>
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-text-secondary">
+                    Showing <strong className="text-agent-blue">{filteredFrameworks.length}</strong> of <strong className="text-agent-blue">{frameworks.length}</strong> frameworks
+                  </p>
+                  {searchQuery && (
+                    <p className="text-sm text-text-secondary mt-1">
+                      Search: <span className="text-agent-blue italic">'{searchQuery}'</span>
+                    </p>
+                  )}
+                </div>
+                {(effort !== 'all' || revenue !== 'all' || searchQuery) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setEffort('all');
+                      setRevenue('all');
+                      setSearchQuery('');
+                    }}
+                  >
+                    Clear All Filters
+                  </Button>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredFrameworks.map((framework) => (
-                  <Card key={framework.id}>
-                    <CardHeader>
-                      <h4 className="text-agent-blue font-semibold mb-3">
-                        {framework.title}
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge
-                          variant={
-                            framework.effort === 'easy'
-                              ? 'easy'
-                              : framework.effort === 'medium'
-                                ? 'medium'
-                                : 'hard'
-                          }
-                        >
-                          {framework.effort.charAt(0).toUpperCase() + framework.effort.slice(1)}
-                        </Badge>
-                        <Badge variant="revenue">
-                          {framework.revenue === 'low'
-                            ? '$'
-                            : framework.revenue === 'medium'
-                              ? '$$'
-                              : '$$$'}
-                        </Badge>
+                {filteredFrameworks.map((framework, idx) => (
+                  <div key={framework.id} className="animate-fade-in" style={{
+                    animationDelay: `${idx * 50}ms`
+                  }}>
+                    <Card className="hover:shadow-card-hover transition-all hover:scale-105 transform">
+                      <CardHeader>
+                        <h4 className="text-agent-blue font-semibold mb-3">
+                          {framework.title}
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge
+                            variant={
+                              framework.effort === 'easy'
+                                ? 'easy'
+                                : framework.effort === 'medium'
+                                  ? 'medium'
+                                  : 'hard'
+                            }
+                          >
+                            {framework.effort.charAt(0).toUpperCase() + framework.effort.slice(1)}
+                          </Badge>
+                          <Badge variant="revenue">
+                            {framework.revenue === 'low'
+                              ? '$'
+                              : framework.revenue === 'medium'
+                                ? '$$'
+                                : '$$$'}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+
+                      <CardBody className="mb-4">
+                        <p className="text-sm text-text-secondary">
+                          {framework.description}
+                        </p>
+                      </CardBody>
+
+                      <div className="pt-4 border-t border-border-light flex items-center justify-between">
+                        <span className="text-xs text-text-secondary">
+                          {framework.readTime} min read
+                        </span>
+                        <Link href={`/guides/${framework.slug}`}>
+                          <Button variant="ghost" size="sm">
+                            Read →
+                          </Button>
+                        </Link>
                       </div>
-                    </CardHeader>
-
-                    <CardBody className="mb-4">
-                      <p className="text-sm text-text-secondary">
-                        {framework.description}
-                      </p>
-                    </CardBody>
-
-                    <div className="pt-4 border-t border-border-light flex items-center justify-between">
-                      <span className="text-xs text-text-secondary">
-                        {framework.readTime} min read
-                      </span>
-                      <Link href={`/guides/${framework.slug}`}>
-                        <Button variant="ghost" size="sm">
-                          Read →
-                        </Button>
-                      </Link>
-                    </div>
-                  </Card>
+                    </Card>
+                  </div>
                 ))}
               </div>
 
