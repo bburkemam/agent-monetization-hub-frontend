@@ -11,6 +11,11 @@ export const Navigation: React.FC = () => {
   const { isAuthenticated, user, logout, isLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navLinks = [
     { label: 'Guides', href: '/guides' },
@@ -51,7 +56,7 @@ export const Navigation: React.FC = () => {
 
         {/* CTA / Auth Section */}
         <div className="flex items-center gap-4">
-          {!isLoading && !isAuthenticated && (
+          {isMounted && !isLoading && !isAuthenticated && (
             <>
               <Link href="/auth/login" className="hidden md:block">
                 <Button variant="secondary" size="sm">
@@ -66,7 +71,7 @@ export const Navigation: React.FC = () => {
             </>
           )}
 
-          {!isLoading && isAuthenticated && (
+          {isMounted && !isLoading && isAuthenticated && (
             <div className="relative hidden md:block">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}

@@ -33,11 +33,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Load token from localStorage on mount
+  // Load token from localStorage on mount (only on client)
   useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token');
+    setIsMounted(true);
+    const savedToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     if (savedToken) {
       setToken(savedToken);
       // Optionally verify token with backend
